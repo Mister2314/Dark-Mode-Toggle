@@ -1,17 +1,23 @@
-# Theme Toggle
+<h1 align="center">Theme Toggle</h1>
 
-**A dark / light theme switcher with animated transitions, system-preference detection and a persisted choice.**
+<p align="center"><b>A dark / light theme switcher with animated transitions, system-preference detection and a persisted choice.</b></p>
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-dark--mode--togglee.netlify.app-2ea44f?style=flat-square&logo=vercel&logoColor=white)](https://dark-mode-togglee.netlify.app/)
+<p align="center">
+[![Live Demo](https://img.shields.io/badge/Live_Demo-▶-2ea44f?style=for-the-badge&logo=vercel&logoColor=white)](https://dark-mode-togglee.netlify.app/)
 ![React 19](https://img.shields.io/badge/React_19-61dafb?style=flat-square&logoColor=white)
 ![Framer Motion](https://img.shields.io/badge/Framer_Motion-e535ab?style=flat-square&logoColor=white)
 ![CSS Modules](https://img.shields.io/badge/CSS_Modules-0969da?style=flat-square&logoColor=white)
+</p>
+
+<p align="center">[**Live demo**](https://dark-mode-togglee.netlify.app/) · [Quick start](#quick-start) · [Features](#features) · [Architecture](#architecture) · [FAQ](#faq)</p>
 
 <p align="center">
   <a href="https://dark-mode-togglee.netlify.app/">
-    <img src="docs/preview.png" alt="Theme Toggle — desktop preview" width="100%">
+    <img src="docs/demo.gif" alt="Theme Toggle — animated demo" width="88%">
   </a>
 </p>
+
+<p align="center"><sub>Live capture of the real build — 801 KB, loops forever.</sub></p>
 
 ## Overview
 
@@ -20,6 +26,15 @@ A small app that does one thing properly: it swaps the whole interface between a
 Theming is driven entirely by CSS custom properties — `themes.css` defines the token set for each theme and a single attribute on `<html>` switches between them, so no component needs to know which theme is active. The `useTheme` hook owns the logic: read the saved value, otherwise fall back to `prefers-color-scheme`, then keep `localStorage` and the DOM in sync.
 
 The transition itself is animated with Framer Motion so the switch reads as a deliberate change rather than a flicker.
+
+## At a glance
+
+| Field | Detail |
+| --- | --- |
+| **Type** | Web application — Vite build |
+| **Primary language** | CSS |
+| **Live demo** | [dark-mode-togglee.netlify.app](https://dark-mode-togglee.netlify.app/) |
+| **Repository** | [Mister2314/Dark-Mode-Toggle](https://github.com/Mister2314/Dark-Mode-Toggle) |
 
 ## Features
 
@@ -40,13 +55,26 @@ The transition itself is animated with Framer Motion so the switch reads as a de
 | Styling | CSS Modules |
 | Build | Vite, ESLint |
 
+## Architecture
+
+```mermaid
+flowchart LR
+  A["useTheme()"] --> B{"Saved in<br/>localStorage?"}
+  B -->|yes| C["Use saved value"]
+  B -->|no| D["prefers-color-scheme"]
+  C --> E["data-theme on &lt;html&gt;"]
+  D --> E
+  E --> F["CSS custom-property<br/>token sets"]
+  F --> G["Every component<br/>reads tokens only"]
+```
+
 ## Screenshots
 
 | Desktop | Mobile |
 | :---: | :---: |
 | <img src="docs/preview.png" alt="Desktop view"> | <img src="docs/preview-mobile.png" alt="Mobile view" width="230"> |
 
-## Getting Started
+## Quick Start
 
 ```bash
 git clone https://github.com/Mister2314/Dark-Mode-Toggle.git
@@ -64,6 +92,35 @@ src/components/ThemeToggle/ — the switch itself
 src/components/Layout/ — page shell that consumes the tokens
 src/App.jsx — demo content showing the theme in use
 ```
+
+## FAQ
+
+<details>
+<summary><b>How is the theme actually applied?</b></summary>
+
+One attribute on `<html>`. `themes.css` defines a token set per theme, and every component styles itself from those tokens — so no component knows which theme is active.
+
+</details>
+
+<details>
+<summary><b>What happens on the very first visit?</b></summary>
+
+There is nothing in `localStorage`, so the hook falls back to the `prefers-color-scheme` media query and matches the operating system.
+
+</details>
+
+<details>
+<summary><b>How would I add a third theme?</b></summary>
+
+Write one more block of custom properties and add its name to the toggle. Nothing in the React tree changes.
+
+</details>
+
+## Roadmap
+
+- [ ] Respect `prefers-reduced-motion` for the transition
+- [ ] Add a system / light / dark tri-state option
+- [ ] Cover the toggle with an accessibility test
 
 ## Notes
 
