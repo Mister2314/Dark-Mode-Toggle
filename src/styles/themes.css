@@ -1,47 +1,116 @@
+/* ============================================================
+   Solstice — theme tokens, scene layers, transition choreography
+   ============================================================ */
+
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --bg-tertiary: #e9ecef;
-  --text-primary: #212529;
-  --text-secondary: #6c757d;
-  --text-accent: #0066cc;
-  --border-color: #dee2e6;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --card-bg: #ffffff;
-  --button-bg: #ffffff;
-  --button-hover: #f8f9fa;
+  /* Light — warm paper daylight */
+  --bg-primary: #faf5ec;
+  --bg-secondary: #f1e9da;
+  --bg-tertiary: #e7ddc9;
+  --text-primary: #23293a;
+  --text-secondary: #565d70;
+  --text-accent: #8a4b0f;
+  --border-color: #e2d8c4;
+  --shadow: rgba(60, 50, 30, 0.14);
+  --card-bg: #fffdf8;
+  --button-bg: #fffdf8;
+  --button-hover: #f3ecdd;
+
+  /* Scene */
+  --sky-top: #a8d4f2;
+  --sky-mid: #f6e3b8;
+  --sky-bottom: #faf5ec;
+  --sun-color: #f6b93b;
+  --sun-glow: rgba(246, 185, 59, 0.55);
+  --star-opacity: 0;
+  --mountain-far: #b9c8b2;
+  --mountain-near: #8ba386;
+  --cloud-opacity: 0.9;
+
+  /* Motion */
+  --ease-theme: cubic-bezier(0.65, 0, 0.35, 1);
+  --theme-dur: 0.7s;
+  color-scheme: light;
 }
 
-[data-theme="dark"],
-body.dark {
-  --bg-primary: #121212;
-  --bg-secondary: #1e1e1e;
-  --bg-tertiary: #2d2d2d;
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --text-accent: #4dabf7;
-  --border-color: #404040;
-  --shadow: rgba(0, 0, 0, 0.3);
-  --card-bg: #1e1e1e;
-  --button-bg: #2d2d2d;
-  --button-hover: #404040;
+[data-theme='dark'] {
+  /* Dark — deep indigo night, cream ink, shared amber accent */
+  --bg-primary: #0d1424;
+  --bg-secondary: #141d33;
+  --bg-tertiary: #1c2742;
+  --text-primary: #f1ecdf;
+  --text-secondary: #a9b3c9;
+  --text-accent: #f2b04a;
+  --border-color: #26314e;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --card-bg: #141d33;
+  --button-bg: #141d33;
+  --button-hover: #1c2742;
+
+  --sky-top: #05070f;
+  --sky-mid: #0d1424;
+  --sky-bottom: #1b2542;
+  --sun-color: #e9e4d4;
+  --sun-glow: rgba(233, 228, 212, 0.35);
+  --star-opacity: 1;
+  --mountain-far: #16203a;
+  --mountain-near: #0a0f1d;
+  --cloud-opacity: 0;
+
+  color-scheme: dark;
 }
 
+html,
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
 }
 
-*,
-*::before,
-*::after {
-  transition: 
-    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* ---- Per-element choreography -------------------------------------
+   Elements opt in with [data-anim] and a --d delay token.
+   Only transform / opacity / color-ish properties animate. */
+body,
+[data-anim] {
+  transition:
+    background-color var(--theme-dur) var(--ease-theme) var(--d, 0s),
+    color var(--theme-dur) var(--ease-theme) var(--d, 0s),
+    border-color var(--theme-dur) var(--ease-theme) var(--d, 0s),
+    box-shadow var(--theme-dur) var(--ease-theme) var(--d, 0s),
+    fill var(--theme-dur) var(--ease-theme) var(--d, 0s),
+    opacity var(--theme-dur) var(--ease-theme) var(--d, 0s);
 }
 
-html {
-  background-color: var(--bg-primary);
+[data-anim='late'] { --d: 0.12s; }
+[data-anim='later'] { --d: 0.24s; }
+[data-anim='last'] { --d: 0.36s; }
+
+/* ---- View Transitions: radial wipe from the toggle ------------------ */
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: solstice-wipe 0.7s var(--ease-theme);
+}
+
+@keyframes solstice-wipe {
+  from {
+    clip-path: circle(0% at var(--tx, 100%) var(--ty, 0%));
+  }
+  to {
+    clip-path: circle(150% at var(--tx, 100%) var(--ty, 0%));
+  }
+}
+
+/* ---- Reduced motion: instant swap, no wipe, no scene drift ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    --d: 0s !important;
+  }
 }

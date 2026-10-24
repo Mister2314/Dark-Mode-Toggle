@@ -1,57 +1,72 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+const STORAGE_KEY = 'theme';
+const VALID = ['light', 'dark', 'system'];
+
+const systemDark = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+const getStoredChoice = () => {
+  if (typeof window === 'undefined') return 'system';
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return VALID.includes(stored) ? stored : 'system';
+  } catch {
+    return 'system';
+  }
+};
+
+const resolvedTheme = (choice) =>
+  choice === 'system' ? (systemDark() ? 'dark' : 'light') : choice;
+
+const applyTheme = (next) => document.documentElement.setAttribute('data-theme', next);
 
 const useTheme = () => {
-  const getInitialTheme = () => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        return savedTheme;
-      }
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return systemPrefersDark ? 'dark' : 'light';
-    }
-    return 'light';
-  };
+  const [choice, setChoice] = useState(getStoredChoice);
+  const [resolved, setResolved] = useState(() => resolvedTheme(getStoredChoice()));
 
-  const [theme, setTheme] = useState(getInitialTheme);
-
+  // Single source of truth: choice -> resolved + DOM + storage.
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-        document.body.className = theme;
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('theme', theme);
+    const next = resolvedTheme(choice);
+    setResolved(next);
+    applyTheme(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, choice);
+    } catch {
+      /* storage unavailable — theme still works for this session */
     }
-    
-    console.log('Theme changed to:', theme); 
-  }, [theme]);
+  }, [choice]);
 
+  // Follow OS preference changes live while in "system" mode.
   useEffect(() => {
-    const initialTheme = getInitialTheme();
-    setTheme(initialTheme);
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = () => {
+      if (choice !== 'system') return;
+      const next = systemDark() ? 'dark' : 'light';
+      setResolved(next);
+      applyTheme(next);
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [choice]);
+
+  const cycleTheme = useCallback(() => {
+    setChoice((prev) => (resolvedTheme(prev) === 'dark' ? 'light' : 'dark'));
   }, []);
 
-  const toggleTheme = () => {
-    console.log('Toggle theme called, current:', theme); 
-    setTheme(prevTheme => {
-      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-      console.log('New theme will be:', newTheme); 
-      return newTheme;
-    });
-  };
-
-  const setSpecificTheme = (newTheme) => {
-    if (newTheme === 'light' || newTheme === 'dark') {
-      setTheme(newTheme);
-    }
-  };
+  const setSpecificTheme = useCallback((next) => {
+    if (VALID.includes(next)) setChoice(next);
+  }, []);
 
   return {
-    theme,
-    toggleTheme,
+    theme: resolved,
+    choice,
+    toggleTheme: cycleTheme,
     setTheme: setSpecificTheme,
-    isDark: theme === 'dark',
-    isLight: theme === 'light'
+    isDark: resolved === 'dark',
+    isLight: resolved === 'light',
+    isSystem: choice === 'system',
   };
 };
 

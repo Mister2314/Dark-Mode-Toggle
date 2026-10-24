@@ -1,119 +1,229 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import Layout from './components/Layout/Layout';
+import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import useTheme from './hooks/useTheme';
 import styles from './App.module.css';
 
-function App() {
-  const { theme, isDark } = useTheme();
+const Stars = () => {
+  const reduceMotion = useReducedMotion();
+  const stars = useMemo(
+    () =>
+      Array.from({ length: 42 }, (_, i) => ({
+        id: i,
+        left: `${(i * 37.7) % 100}%`,
+        top: `${(i * 13.3) % 46}%`,
+        size: 1 + ((i * 7) % 3) * 0.6,
+        delay: `${(i % 9) * 0.06}s`,
+      })),
+    []
+  );
+  return (
+    <div className={styles.stars} aria-hidden="true">
+      {stars.map((s) => (
+        <span
+          key={s.id}
+          className={styles.star}
+          style={{
+            left: s.left,
+            top: s.top,
+            width: s.size,
+            height: s.size,
+            opacity: 'var(--star-opacity)',
+            transitionDelay: reduceMotion ? '0s' : s.delay,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
-  const cardVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
+const Features = () => (
+  <section className={styles.section} aria-labelledby="features-title">
+    <h2 id="features-title" className={styles.sectionTitle} data-anim>
+      What makes this switch different
+    </h2>
+    <div className={styles.featuresGrid}>
+      {[
+        {
+          title: 'Scene morph, not class swap',
+          body: 'Toggling runs a radial wipe (View Transitions API) and morphs a full sky scene — sun to moon, daylight to starfield — with per-element staggered choreography.',
+        },
+        {
+          title: 'System-preference sync',
+          body: 'New visitors inherit prefers-color-scheme and keep following it live; the "system" chip hands control back to the OS at any time.',
+        },
+        {
+          title: 'Persisted, FOUC-free',
+          body: 'Your choice survives reloads via localStorage, applied by an inline pre-hydration script so there is no flash of the wrong theme.',
+        },
+        {
+          title: 'Contrast-verified both ways',
+          body: 'Every palette pair below passes WCAG AA in both modes, and reduced-motion users get an instant swap with no scene animation.',
+        },
+      ].map((f) => (
+        <article key={f.title} className={styles.featureCard} data-anim="late">
+          <h3>{f.title}</h3>
+          <p>{f.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+);
+
+const contrastPairs = [
+  { mode: 'Light', fg: '#23293a', bg: '#faf5ec', ratio: '13.3:1', role: 'Body text' },
+  { mode: 'Light', fg: '#565d70', bg: '#faf5ec', ratio: '6.0:1', role: 'Secondary text' },
+  { mode: 'Light', fg: '#8a4b0f', bg: '#faf5ec', ratio: '6.3:1', role: 'Accent / links' },
+  { mode: 'Dark', fg: '#f1ecdf', bg: '#0d1424', ratio: '15.6:1', role: 'Body text' },
+  { mode: 'Dark', fg: '#a9b3c9', bg: '#0d1424', ratio: '8.7:1', role: 'Secondary text' },
+  { mode: 'Dark', fg: '#f2b04a', bg: '#0d1424', ratio: '9.7:1', role: 'Accent / links' },
+];
+
+const TokenSheet = () => (
+  <section className={styles.section} aria-labelledby="tokens-title">
+    <h2 id="tokens-title" className={styles.sectionTitle} data-anim>
+      Palettes, verified
+    </h2>
+    <div className={styles.tokenGrid}>
+      {contrastPairs.map((p, i) => (
+        <div key={i} className={styles.tokenRow} data-anim="later">
+          <span className={styles.swatch} style={{ background: p.bg }}>
+            <span style={{ background: p.fg }} />
+          </span>
+          <span className={styles.tokenMeta}>
+            <strong>{p.role}</strong> · {p.mode}
+            <em>{p.ratio} — AA pass</em>
+          </span>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const App = () => {
+  const { isDark, isSystem, setTheme } = useTheme();
+  const reduceMotion = useReducedMotion();
+
+  const entrance = {
+    hidden: { opacity: 0, y: 24 },
+    visible: (i) => ({
+      opacity: 1,
       y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 100,
-        delay: 0.2
-      }
-    }
-  };
-
-  const featureVariants = {
-    hidden: { x: -20, opacity: 0 },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 100
-      }
-    }
+      transition: { duration: reduceMotion ? 0 : 0.8, delay: reduceMotion ? 0 : 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] },
+    }),
   };
 
   return (
     <Layout>
-      <div className={styles.app}>
-        <motion.section 
-          className={styles.hero}
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
+      {/* HERO — the scene IS the theme */}
+      <section className={styles.scene} aria-label="Day/night scene">
+        <Stars />
+        <motion.span
+          className={styles.orb}
+          aria-hidden="true"
+          animate={{
+            x: isDark ? '12vw' : '-12vw',
+            y: isDark ? '-4vh' : '2vh',
+            scale: isDark ? 0.72 : 1,
+          }}
+          transition={{ type: 'spring', stiffness: 60, damping: 16 }}
+        />
+        <svg
+          className={styles.mountains}
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+          aria-hidden="true"
         >
-          <motion.div 
-            className={styles.heroIcon}
-            animate={{ 
-              rotate: isDark ? 360 : 0,
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ 
-              rotate: { duration: 0.5 },
-              scale: { duration: 0.3, times: [0, 0.5, 1] }
-            }}
-          >
-            {isDark ? '🌙' : '☀️'}
+          <path
+            className={styles.farRange}
+            d="M0 224 L180 120 L320 210 L520 96 L700 220 L900 130 L1080 214 L1260 110 L1440 200 L1440 320 L0 320 Z"
+          />
+          <path
+            className={styles.nearRange}
+            d="M0 288 L220 190 L420 280 L640 176 L860 272 L1060 196 L1280 276 L1440 210 L1440 320 L0 320 Z"
+          />
+        </svg>
+
+        <div className={styles.hero}>
+          <motion.p className={styles.eyebrow} variants={entrance} initial="hidden" animate="visible" custom={0}>
+            {isDark ? 'Night shift — 23:41' : 'Daylight — 14:06'}
+          </motion.p>
+          <motion.h1 className={styles.headline} variants={entrance} initial="hidden" animate="visible" custom={1}>
+            One switch.
+            <br />
+            Two skies.
+          </motion.h1>
+          <motion.div className={styles.heroToggle} variants={entrance} initial="hidden" animate="visible" custom={2}>
+            <ThemeToggle className={styles.bigToggle} />
           </motion.div>
-          <h2 className={styles.heroTitle}>
-            Dark/Light Mode Toggle
-          </h2>
-          <p className={styles.heroDescription}>
-            Bu tətbiq istifadəçi təcrübəsini yaxşılaşdırmaq üçün dark və light mode arasında keçid imkanı təqdim edir. 
-            Sizin seçiminiz localStorage-da saxlanılır və növbəti dəfə saytı açdığınızda yadda qalır.
-          </p>
-        </motion.section>
+          <motion.p className={styles.sub} variants={entrance} initial="hidden" animate="visible" custom={3}>
+            Press it — the whole page becomes the other time of day.
+          </motion.p>
+          <motion.div className={styles.chips} variants={entrance} initial="hidden" animate="visible" custom={4}>
+            <button
+              type="button"
+              className={styles.chip}
+              aria-pressed={!isSystem && !isDark}
+              onClick={() => setTheme('light')}
+            >
+              Light
+            </button>
+            <button
+              type="button"
+              className={styles.chip}
+              aria-pressed={!isSystem && isDark}
+              onClick={() => setTheme('dark')}
+            >
+              Dark
+            </button>
+            <button
+              type="button"
+              className={styles.chip}
+              aria-pressed={isSystem}
+              onClick={() => setTheme('system')}
+            >
+              Follow system
+            </button>
+          </motion.div>
+        </div>
+      </section>
 
-        <motion.section 
-          className={styles.features}
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <h3 className={styles.sectionTitle}>Xüsusiyyətlər</h3>
-          <div className={styles.featuresGrid} style={{ justifyItems: 'center' }}>
-            {[
-              {
-                icon: '🎨',
-                title: 'Modern Dizayn',
-                description: 'Müasir və minimal dizayn elementləri'
-              },
-              {
-                icon: '⚡',
-                title: 'Sürətli Keçid',
-                description: 'Smooth animasiyalar ilə sürətli tema dəyişimi'
-              },
-              {
-                icon: '💾',
-                title: 'Yaddaş Saxlama',
-                description: 'localStorage ilə seçimin saxlanılması'
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                className={styles.featureCard}
-                variants={featureVariants}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: isDark 
-                    ? '0 8px 25px rgba(0, 0, 0, 0.4)' 
-                    : '0 8px 25px rgba(0, 0, 0, 0.15)'
-                }}
-              >
-                <div className={styles.featureIcon}>{feature.icon}</div>
-                <h4 className={styles.featureTitle}>{feature.title}</h4>
-                <p className={styles.featureDescription}>{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
+      {/* Dual-mode preview */}
+      <section className={styles.section} aria-labelledby="preview-title">
+        <h2 id="preview-title" className={styles.sectionTitle} data-anim>
+          Preview both modes
+        </h2>
+        <div className={styles.previewGrid}>
+          <button
+            type="button"
+            className={styles.previewCard}
+            style={{ background: '#faf5ec', color: '#23293a', borderColor: '#e2d8c4' }}
+            onClick={() => setTheme('light')}
+            data-anim="late"
+          >
+            <span className={styles.previewDot} style={{ background: '#f6b93b' }} />
+            <strong>Daylight</strong>
+            <span>Warm paper, ink text — apply this mode</span>
+          </button>
+          <button
+            type="button"
+            className={styles.previewCard}
+            style={{ background: '#0d1424', color: '#f1ecdf', borderColor: '#26314e' }}
+            onClick={() => setTheme('dark')}
+            data-anim="later"
+          >
+            <span className={styles.previewDot} style={{ background: '#e9e4d4' }} />
+            <strong>Night</strong>
+            <span>Deep indigo, cream text — apply this mode</span>
+          </button>
+        </div>
+      </section>
 
-  
-      </div>
+      <Features />
+      <TokenSheet />
     </Layout>
   );
-}
+};
 
 export default App;

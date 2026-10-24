@@ -1,83 +1,71 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useCallback } from 'react';
+import { flushSync } from 'react-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { BsSun, BsMoon } from 'react-icons/bs';
 import useTheme from '../../hooks/useTheme';
 import styles from './ThemeToggle.module.css';
 
 const ThemeToggle = ({ className = '' }) => {
   const { theme, toggleTheme, isDark } = useTheme();
+  const reduceMotion = useReducedMotion();
 
-  const containerVariants = {
-    light: {
-      backgroundColor: '#ffffff',
-      borderColor: '#dee2e6',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-    },
-    dark: {
-      backgroundColor: '#2d2d2d',
-      borderColor: '#404040',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+  const handleClick = useCallback(() => {
+    // Where is the toggle? The wipe radiates from here.
+    const el = document.querySelector(`.${styles.toggleButton}`);
+    if (el) {
+      const r = el.getBoundingClientRect();
+      const root = document.documentElement;
+      root.style.setProperty('--tx', `${((r.left + r.width / 2) / window.innerWidth) * 100}%`);
+      root.style.setProperty('--ty', `${((r.top + r.height / 2) / window.innerHeight) * 100}%`);
     }
-  };
 
-  const iconVariants = {
-    initial: { scale: 0, rotate: -180 },
-    animate: { 
-      scale: 1, 
-      rotate: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 200,
-        damping: 10
-      }
-    },
-    exit: { scale: 0, rotate: 180 }
-  };
+    const apply = () =>
+      flushSync(() => {
+        toggleTheme();
+      });
 
-  const switchVariants = {
-    light: { x: 2 },
-    dark: { x: 22 }
-  };
+    if (!reduceMotion && typeof document.startViewTransition === 'function') {
+      document.startViewTransition(apply);
+    } else {
+      apply();
+    }
+  }, [toggleTheme, reduceMotion]);
 
   return (
-    <div className={`${styles.toggleContainer} ${className}`}>
-      <motion.button
-        className={styles.toggleButton}
-        onClick={toggleTheme}
-        variants={containerVariants}
-        animate={theme}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label={`${isDark ? 'Light' : 'Dark'} rejimə keç`}
-        title={`${isDark ? 'Light' : 'Dark'} rejimə keç`}
+    <motion.button
+      type="button"
+      className={`${styles.toggleButton} ${className}`}
+      onClick={handleClick}
+      whileHover={{ scale: 1.06 }}
+      whileTap={{ scale: 0.94 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      aria-pressed={isDark}
+      data-anim
+      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+    >
+      <motion.span
+        className={styles.knob}
+        animate={{ x: isDark ? 26 : 0 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 24 }}
       >
-        <motion.div
-          className={styles.toggleSwitch}
-          variants={switchVariants}
-          animate={theme}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        <motion.span
+          className={styles.icon}
+          initial={false}
+          animate={{ rotate: isDark ? 0 : 180, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 16 }}
         >
-          <motion.div
-            key={theme}
-            variants={iconVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className={styles.icon}
-          >
-            {isDark ? (
-              <BsMoon className={styles.moonIcon} />
-            ) : (
-              <BsSun className={styles.sunIcon} />
-            )}
-          </motion.div>
-        </motion.div>
-      </motion.button>
-      
-      <span className={styles.themeLabel}>
-        {isDark ? '🌙 Dark Mode' : '☀️ Light Mode'}
+          {isDark ? (
+            <BsMoon className={styles.moonIcon} aria-hidden="true" />
+          ) : (
+            <BsSun className={styles.sunIcon} aria-hidden="true" />
+          )}
+        </motion.span>
+      </motion.span>
+      <span className={styles.trackLabel} aria-hidden="true">
+        {theme} mode
       </span>
-    </div>
+    </motion.button>
   );
 };
 
