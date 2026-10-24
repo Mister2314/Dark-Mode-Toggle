@@ -1,10 +1,16 @@
-# Dark Mode Toggle
+﻿# Dark Mode Toggle
 
 A React dark / light theme switcher that detects the system preference, animates the transition and persists the choice.
 
 **Live demo:** https://dark-mode-togglee.netlify.app/
 
-<img src="docs/preview.png" alt="Dark Mode Toggle screenshot" width="380">
+<div align="center">
+
+| Desktop | Mobile |
+|---|---|
+| <img src="docs/shot-desktop.png" alt="Desktop view" width="700"> | <img src="docs/shot-mobile.png" alt="Mobile view" width="290"> |
+
+</div>
 
 ## What it does
 
