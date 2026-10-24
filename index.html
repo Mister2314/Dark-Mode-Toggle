@@ -4,14 +4,31 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <meta
+    <meta
       name="description"
-      content="Dark/Light mode toggle app - Tema dəyişdirici tətbiq"
+      content="Solstice — an immersive day/night theme switch. The toggle is the hero: a scene morph, not a class swap."
     />
-    <title>Theme Toggle App</title>
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf5ec" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d1424" />
+    <title>Solstice — Day/Night Theme Switch</title>
+    <script>
+      // Pre-hydration theme bootstrap — prevents FOUC.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var dark =
+            stored === 'dark' ||
+            ((stored === null || stored === 'system') &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
   </head>
   <body>
-     <noscript>Bu tətbiqi işlətmək üçün JavaScript aktiv olmalıdır.</noscript>
+    <noscript>This app needs JavaScript to run. / JavaScript aktiv olmalıdır.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

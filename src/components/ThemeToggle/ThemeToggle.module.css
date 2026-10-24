@@ -1,124 +1,53 @@
-.toggleContainer {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
 .toggleButton {
-  position: relative;
-  width: 50px;
-  height: 26px;
-  border: 2px solid var(--border-color);
-  border-radius: 20px;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  padding: 0;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.toggleButton:focus {
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
-}
-
-.toggleButton:hover {
-  transform: scale(1.05);
-}
-
-.toggleSwitch {
-  position: absolute;
-  top: 1px;
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(135deg, var(--text-accent), #667eea);
-  border-radius: 50%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  gap: 0.6rem;
+  padding: 0.35rem 0.9rem 0.35rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--button-bg);
+  box-shadow: 0 2px 10px var(--shadow);
+  color: var(--text-primary);
+  min-height: 44px; /* touch target */
+}
+
+.knob {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--sun-color);
+  box-shadow: 0 0 14px var(--sun-glow);
+  transition: background var(--theme-dur) var(--ease-theme),
+    box-shadow var(--theme-dur) var(--ease-theme);
 }
 
 .icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.sunIcon,
+.moonIcon {
+  display: block;
 }
 
 .sunIcon {
-  color: #ffd700;
-  font-size: 12px;
-  filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.5));
+  color: #7a4a05;
 }
 
 .moonIcon {
-  color: #e2e8f0;
-  font-size: 12px;
-  filter: drop-shadow(0 0 2px rgba(226, 232, 240, 0.5));
+  color: #0d1424;
 }
 
-.themeLabel {
-  font-size: 14px;
-  font-weight: 500;
+.trackLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-secondary);
-  user-select: none;
-  transition: color 0.3s ease;
-}
-
-@media (max-width: 768px) {
-  .toggleContainer {
-    gap: 0.2rem;
-  }
-  
-  .themeLabel {
-    font-size: 11px;
-  }
-  
-  .toggleButton {
-    width: 38px;
-    height: 20px;
-  }
-  
-  .toggleSwitch {
-    width: 14px;
-    height: 14px;
-  }
-  
-  .sunIcon,
-  .moonIcon {
-    font-size: 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .themeLabel {
-    display: none;
-  }
-  .toggleButton {
-    width: 32px;
-    height: 16px;
-  }
-  .toggleSwitch {
-    width: 10px;
-    height: 10px;
-  }
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(66, 153, 225, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(66, 153, 225, 0);
-  }
-}
-
-.toggleButton:active {
-  animation: pulse 0.3s ease-in-out;
+  min-width: 4.6ch;
 }
