@@ -1,4 +1,4 @@
-﻿# Dark Mode Toggle
+# Dark Mode Toggle
 
 A React dark / light theme switcher that detects the system preference, animates the transition and persists the choice.
 
@@ -6,9 +6,20 @@ A React dark / light theme switcher that detects the system preference, animates
 
 <div align="center">
 
+<img src="docs/demo.gif" alt="Dark Mode Toggle — animated demo" width="700">
+
 | Desktop | Mobile |
 |---|---|
 | <img src="docs/shot-desktop.png" alt="Desktop view" width="700"> | <img src="docs/shot-mobile.png" alt="Mobile view" width="290"> |
+
+<details>
+<summary>More screenshots</summary>
+
+| Desktop | Mobile |
+|---|---|
+| <img src="docs/preview.png" alt="Desktop, alternate view" width="700"> | <img src="docs/preview-mobile.png" alt="Mobile, alternate view" width="290"> |
+
+</details>
 
 </div>
 
