@@ -31,6 +31,11 @@
   --ease-theme: cubic-bezier(0.65, 0, 0.35, 1);
   --theme-dur: 0.7s;
   color-scheme: light;
+
+  /* light-dark() (MDN: resolves against the element's color-scheme, so the
+     per-theme `color-scheme` above picks the branch — no media query needed). */
+  --snippet-bg: light-dark(#efe7d4, #182138);
+  --snippet-accent: light-dark(#8a4b0f, #f2b04a);
 }
 
 [data-theme='dark'] {

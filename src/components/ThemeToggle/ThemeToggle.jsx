@@ -40,7 +40,8 @@ const ThemeToggle = ({ className = '' }) => {
       whileTap={{ scale: 0.94 }}
       transition={{ type: 'spring', stiffness: 400, damping: 22 }}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      aria-pressed={isDark}
+      role="switch"
+      aria-checked={isDark}
       data-anim
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >

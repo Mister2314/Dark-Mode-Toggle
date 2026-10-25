@@ -261,6 +261,80 @@
   font-weight: 600;
 }
 
+/* ---------- Snippets ---------- */
+.sectionSub {
+  color: var(--text-secondary);
+  margin-top: -1.4rem;
+  margin-bottom: 2rem;
+}
+
+.snippetGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+.snippetCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 18px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.snippetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.snippetHead h3 {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.copyBtn {
+  flex-shrink: 0;
+  padding: 0.35rem 0.9rem;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--snippet-accent, var(--text-accent));
+  background: transparent;
+  color: var(--snippet-accent, var(--text-accent));
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s var(--ease-theme), color 0.25s var(--ease-theme);
+}
+
+.copyBtn:hover {
+  background: var(--snippet-accent, var(--text-accent));
+  color: var(--bg-primary);
+}
+
+.snippetNote {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.snippetCode {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  background: var(--snippet-bg, var(--bg-secondary));
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+}
+
 /* ---------- Breakpoints ---------- */
 @media (min-width: 640px) {
   .featuresGrid,
@@ -268,7 +342,8 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .tokenGrid {
+  .tokenGrid,
+  .snippetGrid {
     grid-template-columns: 1fr 1fr;
   }
 }

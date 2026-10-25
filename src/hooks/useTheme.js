@@ -38,6 +38,21 @@ const useTheme = () => {
     }
   }, [choice]);
 
+  // Cross-tab sync: `storage` fires in every OTHER tab when localStorage
+  // changes, so all open windows stay in lockstep without polling.
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key !== STORAGE_KEY) return;
+      const next = VALID.includes(e.newValue) ? e.newValue : 'system';
+      setChoice(next);
+      const resolvedNext = resolvedTheme(next);
+      setResolved(resolvedNext);
+      applyTheme(resolvedNext);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   // Follow OS preference changes live while in "system" mode.
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
